@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Genz</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <script src="js/header.js"></script>
+
+    <section class="products-section">
+        <div class="container">
+            <div class="products-layout">
+                <aside class="filters-sidebar">
+                    <div class="filter-group">
+                        <h3>Search</h3>
+                        <input type="text" id="search-input" class="search-box" placeholder="Search products...">
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Category</h3>
+                        <div class="category-filters" id="category-filters">
+                            <!-- Categories will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Price Range</h3>
+                        <div class="price-filter">
+                            <input type="range" id="price-range" min="0" max="100" value="100" onchange="applyFilters()">
+                            <p>Max: $<span id="price-value">100</span></p>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                </aside>
+
+                <div class="main-content">
+                    <div class="products-header">
+                        <h1>Pokemon Cards</h1>
+                        <div class="sort-container">
+                            <label for="sort-select">Sort by:</label>
+                            <select id="sort-select" onchange="applySorting()">
+                                <option value="newest">Newest</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="name">Name: A to Z</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="products-grid" id="products-container">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Genz is your marketplace for collectible trading cards and fan-favorite Pokemon card finds.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Genz. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/product-data.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let filteredProducts = [...products];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupCategoryFilters();
+            setupPriceFilter();
+            displayProducts(products);
+            updateCartCount();
+            getUrlCategory();
+        });
+
+        function getUrlCategory() {
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get('category');
+            if (category) {
+                const checkbox = document.querySelector(`.category-filters input[value="${category}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    document.querySelector('.category-filters input[value="all"]').checked = false;
+                    applyFilters();
+                }
+            }
+        }
+
+        function setupCategoryFilters() {
+            const categories = [...new Set(products.map(product => product.category))].sort();
+            const container = document.getElementById('category-filters');
+            container.innerHTML = `
+                <label><input type="checkbox" value="all" checked onchange="applyFilters()"> All Categories</label>
+                ${categories.map(category => `
+                    <label><input type="checkbox" value="${category}" onchange="applyFilters()"> ${category}</label>
+                `).join('')}
+            `;
+        }
+
+        function displayProducts(productsToDisplay) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+
+            if (productsToDisplay.length === 0) {
+                container.innerHTML = '<p class="no-products">No products found.</p>';
+                return;
+            }
+
+            productsToDisplay.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+
+                const discountPercentage = product.discount ? Math.abs(product.discount) : 0;
+                const priceHTML = discountPercentage > 0
+                    ? `<div class="price-section"><span class="original-price">${formatPrice(product.originalPrice)}</span><span class="price">${formatPrice(product.price)}</span></div>`
+                    : `<span class="price">${formatPrice(product.price)}</span>`;
+                const ratingHTML = product.rating
+                    ? `<div class="rating"><span class="stars">${'★'.repeat(Math.floor(product.rating))}</span><span class="review-count">(${product.reviewCount})</span></div>`
+                    : '';
+                const discountBadgeHTML = discountPercentage > 0 ? `<div class="discount-badge">${discountPercentage}% off</div>` : '';
+
+                productCard.innerHTML = `
+                    ${discountBadgeHTML}
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" class="product-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="product-category">${product.category}</p>
+                        ${ratingHTML}
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-footer">
+                            ${priceHTML}
+                            <div class="product-buttons">
+                                <a href="product-detail.html?id=${product.id}" class="btn btn-outline">View</a>
+                                <button class="btn btn-small" onclick="addToCart(${product.id})">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const selectedCategories = Array.from(document.querySelectorAll('.category-filters input:checked'))
+                .map(cb => cb.value)
+                .filter(value => value !== 'all');
+            const maxPrice = parseFloat(document.getElementById('price-range').value);
+
+            filteredProducts = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+                const matchesPrice = product.price <= maxPrice;
+
+                return matchesSearch && matchesCategory && matchesPrice;
+            });
+
+            displayProducts(filteredProducts);
+        }
+
+        function applySorting() {
+            const sortValue = document.getElementById('sort-select').value;
+
+            switch (sortValue) {
+                case 'price-low':
+                    filteredProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filteredProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name':
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                default:
+                    filteredProducts.sort((a, b) => b.id - a.id);
+            }
+
+            displayProducts(filteredProducts);
+        }
+
+        function resetFilters() {
+            const maxCatalogPrice = getMaxCatalogPrice();
+
+            document.getElementById('search-input').value = '';
+            document.querySelectorAll('.category-filters input').forEach(checkbox => {
+                checkbox.checked = checkbox.value === 'all';
+            });
+            document.getElementById('price-range').value = maxCatalogPrice;
+            document.getElementById('price-value').textContent = maxCatalogPrice;
+            document.getElementById('sort-select').value = 'newest';
+            filteredProducts = [...products];
+            displayProducts(products);
+        }
+
+        function setupPriceFilter() {
+            const priceRange = document.getElementById('price-range');
+            const maxCatalogPrice = getMaxCatalogPrice();
+
+            priceRange.max = maxCatalogPrice;
+            priceRange.value = maxCatalogPrice;
+            document.getElementById('price-value').textContent = maxCatalogPrice;
+
+            priceRange.addEventListener('input', event => {
+                document.getElementById('price-value').textContent = event.target.value;
+                applyFilters();
+            });
+        }
+
+        function getMaxCatalogPrice() {
+            return Math.ceil(Math.max(...products.map(product => product.price)) / 10) * 10;
+        }
+
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>

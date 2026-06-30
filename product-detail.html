@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail - Genz</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <script src="js/header.js"></script>
+
+    <section class="product-detail-section">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <a href="products.html">Products</a> / <span id="breadcrumb-product">Product</span>
+            </div>
+
+            <div class="product-detail-container">
+                <div class="product-detail-image" id="product-image"></div>
+
+                <div class="product-detail-info">
+                    <h1 id="product-name">Product Name</h1>
+                    <p class="product-category" id="product-category-detail">Category</p>
+
+                    <div class="rating">
+                        <span class="stars" id="product-stars"></span>
+                        <span class="rating-text" id="product-reviews"></span>
+                    </div>
+
+                    <div class="price-section">
+                        <span class="price-label">Price:</span>
+                        <span class="price-large" id="product-price">$0.00</span>
+                    </div>
+
+                    <div class="description-section">
+                        <h3>Description</h3>
+                        <p id="product-description-detail">Product description goes here.</p>
+                    </div>
+
+                    <div class="specifications">
+                        <h3>Specifications</h3>
+                        <ul id="product-specs">
+                            <li>Collector-focused card listing</li>
+                            <li>Protected packaging for shipping</li>
+                            <li>30-day return policy</li>
+                        </ul>
+                    </div>
+
+                    <div class="quantity-section">
+                        <label for="quantity">Quantity:</label>
+                        <div class="quantity-selector">
+                            <button onclick="decreaseQuantity()" class="qty-btn">-</button>
+                            <input type="number" id="quantity" value="1" min="1" max="10">
+                            <button onclick="increaseQuantity()" class="qty-btn">+</button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="addToCartDetail()">Add to Cart</button>
+                        <a class="btn btn-secondary" href="products.html">Continue Shopping</a>
+                    </div>
+
+                    <div class="product-info-extra">
+                        <p>Free shipping on orders over $50</p>
+                        <p>Secure checkout</p>
+                        <p>Cart updates instantly</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="related-products">
+                <h2>Related Products</h2>
+                <div class="products-grid" id="related-products">
+                    <!-- Related products will be loaded here -->
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Genz is your marketplace for collectible trading cards and fan-favorite Pokemon card finds.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Genz. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/product-data.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let currentProduct = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProductDetail();
+            updateCartCount();
+        });
+
+        function loadProductDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = parseInt(params.get('id'), 10);
+
+            currentProduct = products.find(product => product.id === productId);
+
+            if (!currentProduct) {
+                document.querySelector('.product-detail-section .container').innerHTML = `
+                    <div class="empty-cart">
+                        <p>Product not found.</p>
+                        <a href="products.html" class="btn btn-primary">Back to Products</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const discountPercentage = currentProduct.discount ? Math.abs(currentProduct.discount) : 0;
+            const priceHTML = discountPercentage > 0
+                ? `<span class="original-price">${formatPrice(currentProduct.originalPrice)}</span><span class="price">${formatPrice(currentProduct.price)}</span>`
+                : formatPrice(currentProduct.price);
+
+            document.getElementById('product-name').textContent = currentProduct.name;
+            document.getElementById('product-category-detail').textContent = currentProduct.category;
+            document.getElementById('product-price').innerHTML = priceHTML;
+            document.getElementById('product-stars').textContent = '★'.repeat(Math.floor(currentProduct.rating || 0));
+            document.getElementById('product-reviews').textContent = `(${currentProduct.reviewCount || 0} reviews)`;
+            document.getElementById('product-description-detail').textContent = currentProduct.description;
+            document.getElementById('product-image').innerHTML = `<img src="${currentProduct.image}" alt="${currentProduct.name}" class="product-img">`;
+            document.getElementById('breadcrumb-product').textContent = currentProduct.name;
+
+            displayRelatedProducts();
+        }
+
+        function displayRelatedProducts() {
+            const relatedProducts = products
+                .filter(product => product.category === currentProduct.category && product.id !== currentProduct.id)
+                .slice(0, 4);
+
+            const relatedContainer = document.getElementById('related-products');
+            relatedContainer.innerHTML = '';
+
+            relatedProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                const discountPercentage = product.discount ? Math.abs(product.discount) : 0;
+                const discountBadgeHTML = discountPercentage > 0 ? `<div class="discount-badge">${discountPercentage}% off</div>` : '';
+                const ratingHTML = product.rating
+                    ? `<div class="rating"><span class="stars">${'★'.repeat(Math.floor(product.rating))}</span><span class="review-count">(${product.reviewCount})</span></div>`
+                    : '';
+                const priceHTML = discountPercentage > 0
+                    ? `<div class="price-section"><span class="original-price">${formatPrice(product.originalPrice)}</span><span class="price">${formatPrice(product.price)}</span></div>`
+                    : `<span class="price">${formatPrice(product.price)}</span>`;
+
+                card.innerHTML = `
+                    ${discountBadgeHTML}
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" class="product-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="product-category">${product.category}</p>
+                        ${ratingHTML}
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-footer">
+                            ${priceHTML}
+                            <div class="product-buttons">
+                                <a href="product-detail.html?id=${product.id}" class="btn btn-outline">View</a>
+                                <button class="btn btn-small" onclick="addToCart(${product.id})">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                relatedContainer.appendChild(card);
+            });
+        }
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value, 10) < 10) {
+                input.value = parseInt(input.value, 10) + 1;
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value, 10) > 1) {
+                input.value = parseInt(input.value, 10) - 1;
+            }
+        }
+
+        function addToCartDetail() {
+            const quantity = parseInt(document.getElementById('quantity').value, 10);
+            addQuantityToCart(currentProduct.id, quantity);
+            showAddedNotification();
+            document.getElementById('quantity').value = 1;
+        }
+    </script>
+</body>
+</html>
