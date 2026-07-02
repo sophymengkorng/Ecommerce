@@ -4,7 +4,12 @@ function createHeader() {
     <header>
         <nav class="navbar">
             <a class="logo" href="index.html">Gen<span>Z</span></a>
-            <ul class="nav-links">
+            <button class="hamburger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="primary-navigation">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
                 <li>
