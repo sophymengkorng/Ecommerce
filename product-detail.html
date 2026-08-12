@@ -150,7 +150,7 @@
 
             displayRelatedProducts();
         }
-
+        
         function displayRelatedProducts() {
             const relatedProducts = products
                 .filter(product => product.category === currentProduct.category && product.id !== currentProduct.id)

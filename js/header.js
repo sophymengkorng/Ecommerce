@@ -1,4 +1,37 @@
 // Header Component
+function escapeHeaderHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[character]));
+}
+
+function getHeaderCategories() {
+    const productList = typeof products !== 'undefined' && Array.isArray(products) ? products : [];
+
+    if (productList.length === 0) {
+        return [];
+    }
+
+    return [...new Set(productList.map(product => product.category).filter(Boolean))].sort();
+}
+
+function createCategoryDropdown() {
+    const categories = getHeaderCategories();
+
+    return `
+        <ul class="category-dropdown" aria-label="Product categories">
+            <li><a href="products.html">All Categories</a></li>
+            ${categories.map(category => `
+                <li><a href="products.html?category=${encodeURIComponent(category)}">${escapeHeaderHtml(category)}</a></li>
+            `).join('')}
+        </ul>
+    `;
+}
+
 function createHeader() {
     return `
     <header>
@@ -12,13 +45,14 @@ function createHeader() {
             <ul class="nav-links" id="primary-navigation">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li>
-                    <a href="products.html" class="nav-dropdown">
+                <li class="nav-item-has-dropdown">
+                    <a href="products.html" class="nav-dropdown" aria-haspopup="true">
                         Categories
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M6 9l6 6 6-6"></path>
                         </svg>
                     </a>
+                    ${createCategoryDropdown()}
                 </li>
                 <li><a href="products.html">New Arrivals</a></li>
                 <li><a href="#">Contact</a></li>
@@ -44,9 +78,6 @@ function createHeader() {
                     <span id="cart-count" class="cart-count">0</span>
                 </a>
                 <a href="products.html" class="header-shop-btn">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M13 2L4 14h7l-1 8 10-13h-7l0-7z"></path>
-                    </svg>
                     Shop Now
                 </a>
             </div>
