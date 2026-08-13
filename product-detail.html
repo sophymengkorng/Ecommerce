@@ -109,6 +109,7 @@
 
     <script src="js/product-data.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/product-ui.js"></script>
     <script src="js/cart.js"></script>
     <script>
         let currentProduct = null;
@@ -142,7 +143,7 @@
             document.getElementById('product-name').textContent = currentProduct.name;
             document.getElementById('product-category-detail').textContent = currentProduct.category;
             document.getElementById('product-price').innerHTML = priceHTML;
-            document.getElementById('product-stars').textContent = '★'.repeat(Math.floor(currentProduct.rating || 0));
+            document.getElementById('product-stars').textContent = '\u2605'.repeat(Math.floor(currentProduct.rating || 0));
             document.getElementById('product-reviews').textContent = `(${currentProduct.reviewCount || 0} reviews)`;
             document.getElementById('product-description-detail').textContent = currentProduct.description;
             document.getElementById('product-image').innerHTML = `<img src="${currentProduct.image}" alt="${currentProduct.name}" class="product-img">`;
@@ -160,38 +161,7 @@
             relatedContainer.innerHTML = '';
 
             relatedProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-
-                const discountPercentage = product.discount ? Math.abs(product.discount) : 0;
-                const discountBadgeHTML = discountPercentage > 0 ? `<div class="discount-badge">${discountPercentage}% off</div>` : '';
-                const ratingHTML = product.rating
-                    ? `<div class="rating"><span class="stars">${'★'.repeat(Math.floor(product.rating))}</span><span class="review-count">(${product.reviewCount})</span></div>`
-                    : '';
-                const priceHTML = discountPercentage > 0
-                    ? `<div class="price-section"><span class="original-price">${formatPrice(product.originalPrice)}</span><span class="price">${formatPrice(product.price)}</span></div>`
-                    : `<span class="price">${formatPrice(product.price)}</span>`;
-
-                card.innerHTML = `
-                    ${discountBadgeHTML}
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" class="product-img">
-                    </div>
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <p class="product-category">${product.category}</p>
-                        ${ratingHTML}
-                        <p class="product-description">${product.description}</p>
-                        <div class="product-footer">
-                            ${priceHTML}
-                            <div class="product-buttons">
-                                <a href="product-detail.html?id=${product.id}" class="btn btn-outline">View</a>
-                                <button class="btn btn-small" onclick="addToCart(${product.id})">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                relatedContainer.appendChild(card);
+                relatedContainer.appendChild(renderProductCard(product));
             });
         }
 
@@ -211,9 +181,15 @@
 
         function addToCartDetail() {
             const quantity = parseInt(document.getElementById('quantity').value, 10);
-            addQuantityToCart(currentProduct.id, quantity);
-            showAddedNotification();
-            document.getElementById('quantity').value = 1;
+            confirmCartAction({
+                title: 'Add to cart?',
+                message: `Add ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentProduct.name} to your cart?`,
+                confirmLabel: 'Add to Cart'
+            }, () => {
+                addQuantityToCart(currentProduct.id, quantity);
+                showAddedNotification();
+                document.getElementById('quantity').value = 1;
+            });
         }
     </script>
 </body>

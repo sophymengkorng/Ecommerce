@@ -23,11 +23,28 @@ function setupMobileMenu() {
 
 // Update active link
 function updateActiveLink() {
-    const currentPage = window.location.pathname.split('/').pop();
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const searchParams = new URLSearchParams(window.location.search);
+    const activeLabel = currentPage === 'new-arrivals.html'
+        ? 'New Arrivals'
+        : currentPage === 'products.html' && searchParams.has('category')
+        ? 'Categories'
+        : currentPage === 'products.html'
+            ? 'Products'
+            : null;
+
     document.querySelectorAll('.nav-links a').forEach(link => {
+        const linkPage = link.getAttribute('href').split('?')[0];
+        const linkLabel = link.textContent.trim();
+
         link.classList.remove('active');
-        if (link.getAttribute('href') === currentPage || 
-            (currentPage === '' && link.getAttribute('href') === 'index.html')) {
+
+        if (activeLabel && linkLabel === activeLabel) {
+            link.classList.add('active');
+            return;
+        }
+
+        if (!activeLabel && linkPage === currentPage) {
             link.classList.add('active');
         }
     });

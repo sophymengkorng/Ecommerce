@@ -127,6 +127,12 @@
                         <h3>${product.name}</h3>
                         <p>${product.description}</p>
                         <span class="price">${formatPrice(product.price)}</span>
+                        <button type="button" class="cart-favorite-btn ${isFavorite(product.id) ? 'active' : ''}" data-favorite-id="${product.id}" onclick="toggleFavorite(${product.id}, this)" aria-label="${isFavorite(product.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(product.id)}">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"></path>
+                            </svg>
+                            <span>Favorite</span>
+                        </button>
                     </div>
                     <div class="cart-item-quantity">
                         <button onclick="decreaseCartQuantity(${index})" aria-label="Decrease quantity">-</button>
@@ -164,9 +170,20 @@
 
         function removeCartItem(index) {
             const cart = getCart();
-            cart.splice(index, 1);
-            saveCart(cart);
-            displayCart();
+            const product = products.find(cartProduct => cartProduct.id === cart[index]?.id);
+            const productName = product ? product.name : 'this item';
+
+            confirmCartAction({
+                title: 'Remove item?',
+                message: `Remove ${productName} from your cart?`,
+                confirmLabel: 'Remove',
+                danger: true
+            }, () => {
+                const updatedCart = getCart();
+                updatedCart.splice(index, 1);
+                saveCart(updatedCart);
+                displayCart();
+            });
         }
 
         function updateOrderSummary() {

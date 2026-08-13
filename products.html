@@ -6,7 +6,7 @@
     <title>Products - Genz</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="products-page">
     <script src="js/header.js"></script>
 
     <section class="products-section">
@@ -38,15 +38,27 @@
 
                 <div class="main-content">
                     <div class="products-header">
-                        <h1>Pokemon Cards</h1>
-                        <div class="sort-container">
-                            <label for="sort-select">Sort by:</label>
-                            <select id="sort-select" onchange="applySorting()">
-                                <option value="newest">Newest</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
-                                <option value="name">Name: A to Z</option>
-                            </select>
+                        <div>
+                            <h1 id="products-title">Pokemon Cards</h1>
+                            <p id="products-count" class="products-count">Showing 0 of 0 products</p>
+                        </div>
+                        <div class="products-header-actions">
+                            <div class="sort-container">
+                                <label for="sort-select">Sort by:</label>
+                                <select id="sort-select" onchange="applySorting()">
+                                    <option value="newest">Newest</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="name">Name: A to Z</option>
+                                </select>
+                            </div>
+                            <div class="products-selection-bar" id="products-selection-bar">
+                                <label class="products-select-all">
+                                    <input type="checkbox" id="select-all-products" onchange="toggleSelectAllProducts(this.checked)">
+                                    <span id="selected-count">0 selected</span>
+                                </label>
+                                <button type="button" class="btn btn-primary" id="selected-add-cart" onclick="addSelectedProductsToCart()" disabled>Add to Cart (0)</button>
+                            </div>
                         </div>
                     </div>
 
@@ -90,9 +102,12 @@
 
     <script src="js/product-data.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/product-ui.js"></script>
     <script src="js/cart.js"></script>
     <script>
         let filteredProducts = [...products];
+        let showingFavorites = false;
+        let selectedProducts = new Set();
 
         window.addEventListener('DOMContentLoaded', () => {
             setupCategoryFilters();
@@ -105,13 +120,33 @@
         function getUrlCategory() {
             const params = new URLSearchParams(window.location.search);
             const category = params.get('category');
+            const search = params.get('search');
+            showingFavorites = params.get('favorites') === '1';
+
+            if (category) {
+                document.body.classList.remove('products-page');
+                document.body.classList.add('category-page');
+            }
+
+            if (showingFavorites) {
+                document.getElementById('products-title').textContent = 'Favorite Items';
+                document.getElementById('products-selection-bar').hidden = true;
+            }
+
+            if (search) {
+                document.getElementById('search-input').value = search;
+            }
+
             if (category) {
                 const checkbox = document.querySelector(`.category-filters input[value="${category}"]`);
                 if (checkbox) {
                     checkbox.checked = true;
                     document.querySelector('.category-filters input[value="all"]').checked = false;
-                    applyFilters();
                 }
+            }
+
+            if (search || category || showingFavorites) {
+                applyFilters();
             }
         }
 
@@ -129,46 +164,28 @@
         function displayProducts(productsToDisplay) {
             const container = document.getElementById('products-container');
             container.innerHTML = '';
+            selectedProducts = new Set([...selectedProducts].filter(productId => productsToDisplay.some(product => product.id === productId)));
+            updateProductsCount(productsToDisplay.length);
+            updateSelectionBar();
 
             if (productsToDisplay.length === 0) {
-                container.innerHTML = '<p class="no-products">No products found.</p>';
+                container.innerHTML = showingFavorites
+                    ? '<p class="no-products">No favorite items yet.</p>'
+                    : '<p class="no-products">No products found.</p>';
                 return;
             }
 
             productsToDisplay.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-
-                const discountPercentage = product.discount ? Math.abs(product.discount) : 0;
-                const priceHTML = discountPercentage > 0
-                    ? `<div class="price-section"><span class="original-price">${formatPrice(product.originalPrice)}</span><span class="price">${formatPrice(product.price)}</span></div>`
-                    : `<span class="price">${formatPrice(product.price)}</span>`;
-                const ratingHTML = product.rating
-                    ? `<div class="rating"><span class="stars">${'★'.repeat(Math.floor(product.rating))}</span><span class="review-count">(${product.reviewCount})</span></div>`
-                    : '';
-                const discountBadgeHTML = discountPercentage > 0 ? `<div class="discount-badge">${discountPercentage}% off</div>` : '';
-
-                productCard.innerHTML = `
-                    ${discountBadgeHTML}
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" class="product-img">
-                    </div>
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <p class="product-category">${product.category}</p>
-                        ${ratingHTML}
-                        <p class="product-description">${product.description}</p>
-                        <div class="product-footer">
-                            ${priceHTML}
-                            <div class="product-buttons">
-                                <a href="product-detail.html?id=${product.id}" class="btn btn-outline">View</a>
-                                <button class="btn btn-small" onclick="addToCart(${product.id})">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(productCard);
+                container.appendChild(renderProductCard(product));
             });
+            updateSelectionBar();
+        }
+
+        function updateProductsCount(displayedCount) {
+            const countElement = document.getElementById('products-count');
+            countElement.textContent = showingFavorites
+                ? `Showing ${displayedCount} favorite ${displayedCount === 1 ? 'item' : 'items'}`
+                : `Showing ${displayedCount} of ${products.length} products`;
         }
 
         function applyFilters() {
@@ -177,17 +194,83 @@
                 .map(cb => cb.value)
                 .filter(value => value !== 'all');
             const maxPrice = parseFloat(document.getElementById('price-range').value);
+            const favoriteIds = showingFavorites && typeof getFavorites === 'function' ? getFavorites() : [];
 
             filteredProducts = products.filter(product => {
                 const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
                     product.description.toLowerCase().includes(searchTerm);
                 const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
                 const matchesPrice = product.price <= maxPrice;
+                const matchesFavorite = !showingFavorites || favoriteIds.includes(product.id);
 
-                return matchesSearch && matchesCategory && matchesPrice;
+                return matchesSearch && matchesCategory && matchesPrice && matchesFavorite;
             });
 
             displayProducts(filteredProducts);
+        }
+
+        function isProductSelected(productId) {
+            return selectedProducts.has(productId);
+        }
+
+        function toggleProductSelection(productId, checked) {
+            if (checked) {
+                selectedProducts.add(productId);
+            } else {
+                selectedProducts.delete(productId);
+            }
+            updateSelectionBar();
+        }
+
+        function toggleSelectAllProducts(checked) {
+            if (checked) {
+                filteredProducts.forEach(product => selectedProducts.add(product.id));
+            } else {
+                selectedProducts.clear();
+            }
+
+            document.querySelectorAll('.product-select-checkbox').forEach(checkbox => {
+                checkbox.checked = checked;
+            });
+            updateSelectionBar();
+        }
+
+        function updateSelectionBar() {
+            const count = selectedProducts.size;
+            const selectedCountElement = document.getElementById('selected-count');
+            const addButton = document.getElementById('selected-add-cart');
+            const selectAll = document.getElementById('select-all-products');
+
+            if (!selectedCountElement || !addButton || !selectAll) return;
+
+            const canSelectProducts = document.body.classList.contains('products-page') && !showingFavorites;
+            document.getElementById('products-selection-bar').hidden = !canSelectProducts;
+            if (!canSelectProducts) return;
+
+            selectedCountElement.textContent = `${count} selected`;
+            addButton.textContent = `Add to Cart (${count})`;
+            addButton.disabled = count === 0;
+            selectAll.checked = filteredProducts.length > 0 && count === filteredProducts.length;
+            selectAll.indeterminate = count > 0 && count < filteredProducts.length;
+        }
+
+        function addSelectedProductsToCart() {
+            const productIds = [...selectedProducts];
+            if (productIds.length === 0) return;
+
+            confirmCartAction({
+                title: 'Add selected items?',
+                message: `Add ${productIds.length} selected ${productIds.length === 1 ? 'item' : 'items'} to your cart?`,
+                confirmLabel: 'Add to Cart'
+            }, () => {
+                productIds.forEach(productId => addQuantityToCart(productId, 1));
+                selectedProducts.clear();
+                document.querySelectorAll('.product-select-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updateSelectionBar();
+                showAddedNotification();
+            });
         }
 
         function applySorting() {
@@ -220,6 +303,10 @@
             document.getElementById('price-range').value = maxCatalogPrice;
             document.getElementById('price-value').textContent = maxCatalogPrice;
             document.getElementById('sort-select').value = 'newest';
+            showingFavorites = false;
+            document.body.classList.add('products-page');
+            document.body.classList.remove('category-page');
+            document.getElementById('products-title').textContent = 'Pokemon Cards';
             filteredProducts = [...products];
             displayProducts(products);
         }

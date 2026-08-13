@@ -1,4 +1,12 @@
 // Header Component
+(function applySavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+    document.documentElement.dataset.theme = theme;
+})();
+
 function escapeHeaderHtml(value) {
     return String(value).replace(/[&<>"']/g, character => ({
         '&': '&amp;',
@@ -37,13 +45,18 @@ function createHeader() {
     <header>
         <nav class="navbar">
             <a class="logo" href="index.html">Gen<span>Z</span></a>
-            <button class="hamburger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-navigation">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <form class="header-search" action="products.html" method="get" role="search">
+                <input type="search" name="search" placeholder="Search products..." aria-label="Search products">
+                <button type="submit" class="header-search-button" aria-label="Submit search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M16.5 16.5L21 21"></path>
+                    </svg>
+                </button>
+            </form>
             <ul class="nav-links" id="primary-navigation">
                 <li><a href="index.html">Home</a></li>
+                <li><a href="new-arrivals.html">New Arrivals</a></li>
                 <li><a href="products.html">Products</a></li>
                 <li class="nav-item-has-dropdown">
                     <a href="products.html" class="nav-dropdown" aria-haspopup="true">
@@ -54,17 +67,9 @@ function createHeader() {
                     </a>
                     ${createCategoryDropdown()}
                 </li>
-                <li><a href="products.html">New Arrivals</a></li>
-                <li><a href="#">Contact</a></li>
             </ul>
             <div class="nav-right">
-                <a href="products.html" class="header-icon-btn" aria-label="Search products">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"></circle>
-                        <path d="M16.5 16.5L21 21"></path>
-                    </svg>
-                </a>
-                <a href="#" class="header-icon-btn" aria-label="Wishlist">
+                <a href="products.html?favorites=1" class="header-icon-btn" aria-label="View favorite items">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"></path>
                     </svg>
@@ -77,13 +82,35 @@ function createHeader() {
                     </svg>
                     <span id="cart-count" class="cart-count">0</span>
                 </a>
-                <a href="products.html" class="header-shop-btn">
-                    Shop Now
-                </a>
+                <button type="button" class="theme-toggle" aria-label="Switch color mode" aria-pressed="false">
+                    <span class="theme-toggle-icon" aria-hidden="true"></span>
+                </button>
             </div>
         </nav>
     </header>
     `;
+}
+
+function updateThemeToggleButton() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (!themeToggle) return;
+
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    themeToggle.setAttribute('aria-pressed', isDark.toString());
+    themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (!themeToggle) return;
+
+    updateThemeToggleButton();
+    themeToggle.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = nextTheme;
+        localStorage.setItem('theme', nextTheme);
+        updateThemeToggleButton();
+    });
 }
 
 function renderHeader() {
@@ -92,6 +119,7 @@ function renderHeader() {
     headerElement.innerHTML = createHeader();
     body.insertBefore(headerElement.firstElementChild, body.firstChild);
 
+    setupThemeToggle();
     updateCartCount();
 }
 

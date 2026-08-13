@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Arrivals - Genz</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="new-arrivals-page">
+    <script src="js/header.js"></script>
+
+    <main class="arrival-screen">
+        <section class="arrival-hero">
+            <div class="arrival-hero-copy">
+                <p class="arrival-eyebrow">New Arrivals</p>
+                <h1>Fresh Cards Unleashed!</h1>
+                <p>Be first to collect the latest and most powerful Pokemon cards.</p>
+                <div class="arrival-hero-actions">
+                    <a class="arrival-primary-action" href="#featured-new-arrivals">Explore Collection</a>
+                    <a class="arrival-secondary-action" href="products.html">View All Cards</a>
+                </div>
+            </div>
+
+            <div class="arrival-hero-stage" aria-label="Featured new Pokemon cards">
+                <article class="arrival-hero-card arrival-hero-card-left" id="arrival-hero-left"></article>
+                <article class="arrival-hero-card arrival-hero-card-main" id="arrival-hero-main"></article>
+                <article class="arrival-hero-card arrival-hero-card-right" id="arrival-hero-right"></article>
+                <div class="arrival-week-badge">
+                    <span>New</span>
+                    <strong>This Week</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="arrival-featured" id="featured-new-arrivals">
+            <div class="arrival-section-header">
+                <h2>Featured New Arrivals</h2>
+                <a href="products.html">View All</a>
+            </div>
+            <div class="arrival-card-grid" id="arrival-card-grid"></div>
+        </section>
+
+        <section class="arrival-collections">
+            <div class="arrival-section-header">
+                <h2>Collections You'll Love</h2>
+            </div>
+            <div class="arrival-collection-grid" id="arrival-collection-grid"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Genz is your marketplace for collectible trading cards and fan-favorite Pokemon card finds.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="new-arrivals.html">New Arrivals</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Genz. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/product-data.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/product-ui.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        const arrivalProducts = [...products].sort((a, b) => b.id - a.id);
+        const heroProducts = [arrivalProducts[1], arrivalProducts[0], arrivalProducts[2]].filter(Boolean);
+        const collectionData = [
+            { title: 'Pikachu Collection', category: 'Pikachu Cards', product: products.find(product => product.category === 'Pikachu Cards') },
+            { title: 'Legendary Cards', category: 'Rare Cards', product: products.find(product => product.category === 'Rare Cards') },
+            { title: 'Vintage Collection', category: 'Sealed Product', product: products.find(product => product.category === 'Sealed Product') },
+            { title: 'Custom Collection', category: 'Custom Cards', product: products.find(product => product.category === 'Custom Cards') }
+        ].filter(collection => collection.product);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderArrivalHero();
+            renderArrivalCards(arrivalProducts.slice(0, 5));
+            renderArrivalCollections();
+            updateCartCount();
+        });
+
+        function renderArrivalHero() {
+            const targets = ['arrival-hero-left', 'arrival-hero-main', 'arrival-hero-right'];
+            heroProducts.forEach((product, index) => {
+                const target = document.getElementById(targets[index]);
+                target.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <span>${product.name}</span>
+                `;
+            });
+        }
+
+        function renderArrivalCards(productsToDisplay) {
+            const container = document.getElementById('arrival-card-grid');
+            container.innerHTML = '';
+            productsToDisplay.forEach(product => {
+                const card = document.createElement('article');
+                const favoriteActive = isFavorite(product.id);
+                const discount = product.discount ? Math.abs(product.discount) : 0;
+                card.className = 'arrival-product-card';
+                card.innerHTML = `
+                    ${discount ? `<span class="arrival-discount">-${discount}%</span>` : ''}
+                    <button type="button" class="favorite-btn arrival-favorite-btn ${favoriteActive ? 'active' : ''}" data-favorite-id="${product.id}" onclick="toggleFavorite(${product.id}, this)" aria-label="${favoriteActive ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favoriteActive}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="arrival-card-image" onclick="openProductDialog(${product.id})" aria-label="View ${product.name}">
+                        <img src="${product.image}" alt="${product.name}">
+                    </button>
+                    <div class="arrival-card-body">
+                        <h3>${product.name}</h3>
+                        <div class="arrival-rating">
+                            <span>${'\u2605'.repeat(Math.floor(product.rating || 0))}</span>
+                            <small>(${product.reviewCount || 0})</small>
+                        </div>
+                        <strong>${formatPrice(product.price)}</strong>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderArrivalCollections() {
+            const container = document.getElementById('arrival-collection-grid');
+            container.innerHTML = '';
+            collectionData.forEach(collection => {
+                const card = document.createElement('a');
+                card.className = 'arrival-collection-card';
+                card.href = `products.html?category=${encodeURIComponent(collection.category)}`;
+                card.innerHTML = `
+                    <img src="${collection.product.image}" alt="${collection.title}">
+                    <span>
+                        <strong>${collection.title}</strong>
+                        <small>View Collection</small>
+                    </span>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
