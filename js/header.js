@@ -85,6 +85,11 @@ function createHeader() {
                 <button type="button" class="theme-toggle" aria-label="Switch color mode" aria-pressed="false">
                     <span class="theme-toggle-icon" aria-hidden="true"></span>
                 </button>
+                <button type="button" class="hamburger" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </nav>
     </header>

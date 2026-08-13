@@ -3,21 +3,54 @@
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-links');
+    const dropdownItem = document.querySelector('.nav-item-has-dropdown');
 
     if (!hamburger || !navMenu) return;
+
+    const closeMenu = () => {
+        navMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'Open navigation menu');
+        dropdownItem?.classList.remove('dropdown-open');
+    };
 
     hamburger.addEventListener('click', () => {
         const isOpen = navMenu.classList.toggle('active');
         hamburger.classList.toggle('active', isOpen);
         hamburger.setAttribute('aria-expanded', isOpen.toString());
+        hamburger.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+
+        if (!isOpen) {
+            dropdownItem?.classList.remove('dropdown-open');
+        }
     });
 
     document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            hamburger.classList.remove('active');
-            hamburger.setAttribute('aria-expanded', 'false');
+        link.addEventListener('click', (event) => {
+            const isMobile = window.matchMedia('(max-width: 900px)').matches;
+
+            if (isMobile && link.classList.contains('nav-dropdown')) {
+                event.preventDefault();
+                dropdownItem?.classList.toggle('dropdown-open');
+                return;
+            }
+
+            closeMenu();
         });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!navMenu.classList.contains('active')) return;
+        if (event.target.closest('.navbar')) return;
+
+        closeMenu();
+    });
+
+    window.addEventListener('resize', () => {
+        if (!window.matchMedia('(max-width: 900px)').matches) {
+            closeMenu();
+        }
     });
 }
 
