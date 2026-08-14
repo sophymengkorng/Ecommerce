@@ -10,7 +10,7 @@ const products = [
         rating: 4.8,
         reviewCount: 318,
         description: 'A Pokemon TCG display box for collectors and new players building a fresh deck.',
-        image: 'image/Pokemon_ Trading Card Game.jpg'
+        image: 'image/chan money.jpg'
     },
     {
         id: 2,
