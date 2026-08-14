@@ -1,8 +1,7 @@
 // Header Component
 (function applySavedTheme() {
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    const theme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light';
 
     document.documentElement.dataset.theme = theme;
 })();
