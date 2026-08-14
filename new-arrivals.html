@@ -84,7 +84,13 @@
     <script src="js/product-ui.js"></script>
     <script src="js/cart.js"></script>
     <script>
-        const arrivalProducts = [...products].sort((a, b) => b.id - a.id);
+        const featuredArrivalProduct = products.find(product => product.image === 'image/chan money.jpg');
+        const arrivalProducts = [
+            featuredArrivalProduct,
+            ...products
+                .filter(product => product !== featuredArrivalProduct)
+                .sort((a, b) => b.id - a.id)
+        ].filter(Boolean);
         const heroProducts = [arrivalProducts[1], arrivalProducts[0], arrivalProducts[2]].filter(Boolean);
         const collectionData = [
             { title: 'Pikachu Collection', category: 'Pikachu Cards', product: products.find(product => product.category === 'Pikachu Cards') },
