@@ -47,6 +47,13 @@ function setupMobileMenu() {
         closeMenu();
     });
 
+    window.addEventListener('scroll', () => {
+        if (!window.matchMedia('(max-width: 900px)').matches) return;
+        if (!navMenu.classList.contains('active')) return;
+
+        closeMenu();
+    }, { passive: true });
+
     window.addEventListener('resize', () => {
         if (!window.matchMedia('(max-width: 900px)').matches) {
             closeMenu();
@@ -89,7 +96,8 @@ function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartCountElements = document.querySelectorAll('#cart-count');
     cartCountElements.forEach(element => {
-        element.textContent = totalItems;
+        element.textContent = totalItems > 0 ? totalItems : '';
+        element.hidden = totalItems === 0;
     });
 }
 
