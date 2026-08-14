@@ -45,7 +45,9 @@ function isHomePage() {
 }
 
 function createHeaderSearch() {
-    if (isHomePage()) return '';
+    if (isHomePage()) {
+        return '<div class="header-search header-search-placeholder" aria-hidden="true"></div>';
+    }
 
     return `
         <form class="header-search" action="products.html" method="get" role="search">

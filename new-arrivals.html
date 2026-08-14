@@ -132,9 +132,9 @@
                             <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6z"></path>
                         </svg>
                     </button>
-                    <button type="button" class="arrival-card-image" onclick="openProductDialog(${product.id})" aria-label="View ${product.name}">
+                    <a class="arrival-card-image" href="product-detail.html?id=${product.id}" aria-label="View ${product.name}">
                         <img src="${product.image}" alt="${product.name}">
-                    </button>
+                    </a>
                     <div class="arrival-card-body">
                         <h3>${product.name}</h3>
                         <div class="arrival-rating">

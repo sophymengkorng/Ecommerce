@@ -34,7 +34,8 @@ export default defineConfig({
         newArrivals: resolve(__dirname, 'new-arrivals.html'),
         productDetail: resolve(__dirname, 'product-detail.html'),
         cart: resolve(__dirname, 'cart.html'),
-        checkout: resolve(__dirname, 'checkout.html')
+        checkout: resolve(__dirname, 'checkout.html'),
+        orderSuccess: resolve(__dirname, 'order-success.html')
       }
     }
   }

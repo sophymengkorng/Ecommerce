@@ -65,6 +65,13 @@
                         <p>Secure checkout</p>
                         <p>Cart updates instantly</p>
                     </div>
+
+                    <div class="pokemon-api-section">
+                        <h3>Poke Info</h3>
+                        <div id="pokemon-api-content">
+                            <p class="pokemon-api-message">PokeAPI data will load here.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -111,6 +118,7 @@
     <script src="js/script.js"></script>
     <script src="js/product-ui.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/poke-api.js"></script>
     <script>
         let currentProduct = null;
 
@@ -150,6 +158,7 @@
             document.getElementById('breadcrumb-product').textContent = currentProduct.name;
 
             displayRelatedProducts();
+            renderPokemonApiInfo(currentProduct);
         }
         
         function displayRelatedProducts() {

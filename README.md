@@ -12,9 +12,10 @@ Genz is a responsive Pokemon trading card e-commerce website built with HTML, CS
 - **New arrivals page**: Highlights recent cards with a featured hero layout, arrival product cards, favorite buttons, and collection shortcuts.
 - **Product preview dialog**: Product cards can open a quick-view dialog with image, rating, description, specifications, quantity selector, and add-to-cart action.
 - **Product detail page**: Supports direct product pages by `id` query parameter, quantity selection, cart adding, breadcrumbs, and related products from the same category.
+- **PokeAPI integration**: Product detail pages load matching Pokemon profile data from `https://pokeapi.co/api/v2/`, plus Pokemon version data from `https://pokeapi.co/api/v2/version/13/`.
 - **Favorites**: Shoppers can favorite products from the catalog, arrival cards, and cart. Favorite IDs are stored in browser local storage and can be viewed on the favorites page.
-- **Shopping cart**: Cart data persists in local storage, shows item images and descriptions, updates quantities, removes items, calculates subtotal, tax, shipping, and total, and shows the live cart count in the header.
-- **Checkout flow**: Includes shipping information fields, shipping method choices, payment fields, terms validation, order summary totals, simulated order number, cart clearing, and redirect after order completion.
+- **Shopping cart**: Cart data persists in local storage, shows item images and descriptions, updates quantities, removes items, applies promo codes, calculates subtotal, discount, tax, shipping, and total, and shows the live cart count in the header.
+- **Checkout flow**: Includes shipping information fields, shipping method choices, payment fields, terms validation, order summary totals, simulated order number, cart clearing, and redirect to an order success page.
 - **Responsive design**: Layout and navigation are built for desktop, tablet, and mobile screens.
 
 ## Pages
@@ -27,6 +28,7 @@ Genz is a responsive Pokemon trading card e-commerce website built with HTML, CS
 | `product-detail.html` | Individual product detail view loaded by product ID |
 | `cart.html` | Shopping cart, quantity controls, totals, and promo-code UI |
 | `checkout.html` | Simulated checkout and order completion |
+| `order-success.html` | Order confirmation page after checkout |
 
 ## Project Structure
 
@@ -38,6 +40,7 @@ Genz is a responsive Pokemon trading card e-commerce website built with HTML, CS
 |-- product-detail.html
 |-- cart.html
 |-- checkout.html
+|-- order-success.html
 |-- css/
 |   `-- style.css
 |-- js/
@@ -45,6 +48,7 @@ Genz is a responsive Pokemon trading card e-commerce website built with HTML, CS
 |   |-- script.js
 |   |-- product-data.js
 |   |-- product-ui.js
+|   |-- poke-api.js
 |   `-- cart.js
 |-- image/
 |   `-- product and marketplace images
@@ -58,6 +62,7 @@ Genz is a responsive Pokemon trading card e-commerce website built with HTML, CS
 - HTML5
 - CSS3
 - Vanilla JavaScript
+- PokeAPI
 - Local Storage API
 - Vite for local development and production builds
 
@@ -93,9 +98,11 @@ Products are stored in `js/product-data.js`. Each product includes an ID, name, 
 
 Cart items, favorites, and theme preference are saved in browser local storage, so user selections can remain available after refreshing the page.
 
+PokeAPI calls are handled in `js/poke-api.js`. Product profile requests use endpoint values such as `pokemon/pikachu`, so the final request becomes `https://pokeapi.co/api/v2/pokemon/pikachu/`. The version panel uses your endpoint exactly: `https://pokeapi.co/api/v2/version/13/`.
+
 ## Current Limitations
 
 - Checkout is simulated and does not connect to a real payment gateway.
 - Orders are not saved to a backend database.
-- Promo-code UI exists on the cart page, but discounts are not applied to the cart total yet.
+- PokeAPI provides Pokemon profile data, not trading-card pricing or inventory data.
 - User accounts, admin product management, and order history are not implemented.

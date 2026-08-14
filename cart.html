@@ -34,6 +34,11 @@
                             <span id="tax">$0.00</span>
                         </div>
 
+                        <div class="summary-row" id="discount-row" hidden>
+                            <span>Discount:</span>
+                            <span id="discount">-$0.00</span>
+                        </div>
+
                         <div class="summary-row">
                             <span>Shipping:</span>
                             <span id="shipping">$0.00</span>
@@ -52,6 +57,8 @@
                         <h3>Promo Code</h3>
                         <input type="text" id="promo-input" placeholder="Enter promo code">
                         <button class="btn btn-outline" onclick="applyPromoCode()">Apply</button>
+                        <button class="btn btn-secondary" id="remove-promo-button" onclick="removePromoCode()" hidden>Remove</button>
+                        <p class="promo-message" id="promo-message"></p>
                     </div>
                 </aside>
             </div>
@@ -92,7 +99,15 @@
     <script src="js/script.js"></script>
     <script src="js/cart.js"></script>
     <script>
+        const PROMO_STORAGE_KEY = 'genz_promo_code';
+        const promoCodes = {
+            SAVE10: { type: 'percent', value: 0.10, label: '10% off' },
+            SAVE20: { type: 'percent', value: 0.20, label: '20% off' },
+            FREESHIP: { type: 'shipping', value: 0, label: 'Free shipping' }
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
+            restorePromoCode();
             displayCart();
             updateCartCount();
         });
@@ -119,12 +134,15 @@
 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
+                cartItem.setAttribute('role', 'link');
+                cartItem.setAttribute('tabindex', '0');
+                cartItem.setAttribute('aria-label', `View details for ${product.name}`);
                 cartItem.innerHTML = `
-                    <div class="cart-item-image">
+                    <a class="cart-item-image" href="product-detail.html?id=${product.id}" aria-label="View details for ${product.name}">
                         <img src="${product.image}" alt="${product.name}" class="product-img">
-                    </div>
+                    </a>
                     <div class="cart-item-details">
-                        <h3>${product.name}</h3>
+                        <h3><a href="product-detail.html?id=${product.id}">${product.name}</a></h3>
                         <p>${product.description}</p>
                         <span class="price">${formatPrice(product.price)}</span>
                         <button type="button" class="cart-favorite-btn ${isFavorite(product.id) ? 'active' : ''}" data-favorite-id="${product.id}" onclick="toggleFavorite(${product.id}, this)" aria-label="${isFavorite(product.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(product.id)}">
@@ -144,6 +162,15 @@
                     </div>
                     <button class="btn-remove" onclick="removeCartItem(${index})" aria-label="Remove ${product.name}">Remove</button>
                 `;
+                cartItem.addEventListener('click', event => {
+                    if (event.target.closest('a, button, input')) return;
+                    window.location.href = `product-detail.html?id=${product.id}`;
+                });
+                cartItem.addEventListener('keydown', event => {
+                    if (event.key !== 'Enter') return;
+                    if (event.target.closest('a, button, input')) return;
+                    window.location.href = `product-detail.html?id=${product.id}`;
+                });
                 container.appendChild(cartItem);
             });
 
@@ -197,12 +224,17 @@
                 }
             });
 
-            const tax = subtotal * 0.1;
-            const shipping = subtotal === 0 || subtotal > 50 ? 0 : 10;
-            const total = subtotal + tax + shipping;
+            const promo = getAppliedPromo();
+            const discount = promo?.type === 'percent' ? subtotal * promo.value : 0;
+            const taxableSubtotal = Math.max(subtotal - discount, 0);
+            const tax = taxableSubtotal * 0.1;
+            const shipping = subtotal === 0 || subtotal > 50 || promo?.type === 'shipping' ? 0 : 10;
+            const total = Math.max(subtotal - discount + tax + shipping, 0);
 
             document.getElementById('subtotal').textContent = formatPrice(subtotal);
             document.getElementById('tax').textContent = formatPrice(tax);
+            document.getElementById('discount-row').hidden = discount === 0;
+            document.getElementById('discount').textContent = `-${formatPrice(discount)}`;
             document.getElementById('shipping').textContent = shipping === 0 ? 'FREE' : formatPrice(shipping);
             document.getElementById('total').textContent = formatPrice(total);
         }
@@ -219,17 +251,43 @@
 
         function applyPromoCode() {
             const code = document.getElementById('promo-input').value.trim().toUpperCase();
-            const promoCodes = {
-                SAVE10: 0.10,
-                SAVE20: 0.20,
-                FREESHIP: 0
-            };
 
             if (Object.prototype.hasOwnProperty.call(promoCodes, code)) {
-                alert(`Promo code applied: ${code}`);
+                localStorage.setItem(PROMO_STORAGE_KEY, code);
+                updatePromoMessage(`${code} applied: ${promoCodes[code].label}.`, false);
+                document.getElementById('remove-promo-button').hidden = false;
+                updateOrderSummary();
             } else {
-                alert('Invalid promo code!');
+                updatePromoMessage('Invalid promo code. Try SAVE10, SAVE20, or FREESHIP.', true);
             }
+        }
+
+        function removePromoCode() {
+            localStorage.removeItem(PROMO_STORAGE_KEY);
+            document.getElementById('promo-input').value = '';
+            document.getElementById('remove-promo-button').hidden = true;
+            updatePromoMessage('Promo code removed.', false);
+            updateOrderSummary();
+        }
+
+        function restorePromoCode() {
+            const code = localStorage.getItem(PROMO_STORAGE_KEY);
+            if (!code || !promoCodes[code]) return;
+
+            document.getElementById('promo-input').value = code;
+            document.getElementById('remove-promo-button').hidden = false;
+            updatePromoMessage(`${code} applied: ${promoCodes[code].label}.`, false);
+        }
+
+        function getAppliedPromo() {
+            const code = localStorage.getItem(PROMO_STORAGE_KEY);
+            return code && promoCodes[code] ? promoCodes[code] : null;
+        }
+
+        function updatePromoMessage(message, isError) {
+            const messageElement = document.getElementById('promo-message');
+            messageElement.textContent = message;
+            messageElement.classList.toggle('error', isError);
         }
     </script>
 </body>

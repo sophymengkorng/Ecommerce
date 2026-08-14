@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - ShopHub</title>
+    <title>Checkout - Genz</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -145,6 +145,11 @@
                             <span id="checkout-tax">$0.00</span>
                         </div>
 
+                        <div class="summary-row" id="checkout-discount-row" hidden>
+                            <span>Discount:</span>
+                            <span id="checkout-discount">-$0.00</span>
+                        </div>
+
                         <div class="summary-row">
                             <span>Shipping:</span>
                             <span id="checkout-shipping">$10.00</span>
@@ -169,7 +174,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>About Us</h3>
-                    <p>ShopHub is your premier destination for quality products and exceptional service.</p>
+                    <p>Genz is your marketplace for collectible trading cards and fan-favorite Pokemon card finds.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Quick Links</h3>
@@ -189,7 +194,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 ShopHub. All rights reserved.</p>
+                <p>&copy; 2026 Genz. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -198,6 +203,14 @@
     <script src="js/script.js"></script>
     <script src="js/cart.js"></script>
     <script>
+        const PROMO_STORAGE_KEY = 'genz_promo_code';
+        const LAST_ORDER_STORAGE_KEY = 'genz_last_order';
+        const promoCodes = {
+            SAVE10: { type: 'percent', value: 0.10, label: '10% off' },
+            SAVE20: { type: 'percent', value: 0.20, label: '20% off' },
+            FREESHIP: { type: 'shipping', value: 0, label: 'Free shipping' }
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
             displayCheckoutSummary();
             updateCartCount();
@@ -246,17 +259,30 @@
         function updateCheckoutTotals(subtotal) {
             const shippingOption = document.querySelector('input[name="shipping"]:checked').value;
             const shippingCosts = { standard: 10, express: 20, overnight: 35 };
-            const shipping = shippingCosts[shippingOption];
-            const tax = subtotal * 0.1;
-            const total = subtotal + tax + shipping;
+            const promo = getAppliedPromo();
+            const shipping = promo?.type === 'shipping' ? 0 : shippingCosts[shippingOption];
+            const discount = promo?.type === 'percent' ? subtotal * promo.value : 0;
+            const taxableSubtotal = Math.max(subtotal - discount, 0);
+            const tax = taxableSubtotal * 0.1;
+            const total = Math.max(taxableSubtotal + tax + shipping, 0);
 
             document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
             document.getElementById('checkout-tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('checkout-discount-row').hidden = discount === 0;
+            document.getElementById('checkout-discount').textContent = `-$${discount.toFixed(2)}`;
             document.getElementById('checkout-shipping').textContent = `$${shipping.toFixed(2)}`;
             document.getElementById('checkout-total').textContent = `$${total.toFixed(2)}`;
+
+            return { subtotal, tax, discount, shipping, total, promoCode: getAppliedPromoCode() };
         }
 
         function completeOrder() {
+            if (getCart().length === 0) {
+                alert('Your cart is empty!');
+                window.location.href = 'products.html';
+                return;
+            }
+
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
             const email = document.getElementById('email').value;
@@ -269,13 +295,54 @@
 
             // Simulate order processing
             const orderNumber = 'ORD-' + Date.now();
-            alert(`Order placed successfully!\nOrder Number: ${orderNumber}\nA confirmation email has been sent to ${email}`);
+            const orderTotals = getCheckoutTotals();
+            const cart = getCart();
+            const items = cart.map(item => {
+                const product = products.find(productItem => productItem.id === item.id);
+                return {
+                    id: item.id,
+                    name: product ? product.name : 'Unknown product',
+                    quantity: item.quantity,
+                    price: product ? product.price : 0
+                };
+            });
+
+            localStorage.setItem(LAST_ORDER_STORAGE_KEY, JSON.stringify({
+                orderNumber,
+                email,
+                customerName: `${firstName} ${lastName}`,
+                items,
+                totals: orderTotals,
+                createdAt: new Date().toISOString()
+            }));
             
             // Clear cart
             clearCart();
+            localStorage.removeItem(PROMO_STORAGE_KEY);
             
-            // Redirect to home
-            window.location.href = 'index.html';
+            // Redirect to order success page
+            window.location.href = `order-success.html?order=${encodeURIComponent(orderNumber)}`;
+        }
+
+        function getCheckoutSubtotal() {
+            return getCart().reduce((sum, item) => {
+                const product = products.find(productItem => productItem.id === item.id);
+                return product ? sum + product.price * item.quantity : sum;
+            }, 0);
+        }
+
+        function getCheckoutTotals() {
+            return updateCheckoutTotals(getCheckoutSubtotal());
+        }
+
+        function getAppliedPromoCode() {
+            const code = localStorage.getItem(PROMO_STORAGE_KEY);
+            return code && promoCodes[code] ? code : null;
+        }
+
+        function getAppliedPromo() {
+            const code = getAppliedPromoCode();
+            return code ? promoCodes[code] : null;
         }
     </script>
 </body>

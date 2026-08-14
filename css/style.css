@@ -426,6 +426,11 @@ header {
     flex: 0 1 330px;
 }
 
+.header-search-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .header-search input {
     min-width: 0;
     width: 100%;
@@ -893,6 +898,18 @@ header {
     box-shadow: inset 0 0 0 1px rgba(0, 93, 164, 0.06);
 }
 
+.product-image-button {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.product-image-button:hover,
+.product-image-button:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--primary-color);
+}
+
 .image-placeholder {
     font-size: 4.5rem;
     text-align: center;
@@ -923,6 +940,22 @@ header {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.product-title-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.product-title-button:hover,
+.product-title-button:focus-visible {
+    color: var(--primary-color);
+    text-decoration: underline;
 }
 
 .product-category {
@@ -1566,6 +1599,7 @@ header {
 }
 
 .arrival-card-image {
+    display: block;
     width: 100%;
     aspect-ratio: 1.35;
     border: 0;
@@ -1573,6 +1607,11 @@ header {
     background: var(--arrival-panel-soft);
     padding: 0.35rem;
     cursor: pointer;
+}
+
+.arrival-card-image:hover,
+.arrival-card-image:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .arrival-card-image img {
@@ -2168,8 +2207,9 @@ header {
 
 .product-detail-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+    align-items: start;
+    gap: clamp(2rem, 4vw, 3rem);
     max-width: 1200px;
     margin: 0 auto 4rem;
     background-color: var(--surface-color);
@@ -2179,12 +2219,22 @@ header {
 
 .product-detail-image {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     background: var(--image-bg);
     border-radius: 8px;
-    min-height: 520px;
-    padding: 2rem;
+    min-height: 0;
+    height: clamp(520px, 62vw, 740px);
+    padding: clamp(1.25rem, 2.2vw, 2rem);
+    overflow: hidden;
+}
+
+.product-detail-image .product-img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: top center;
 }
 
 .product-detail-info h1 {
@@ -2281,6 +2331,96 @@ header {
     color: var(--gray-color);
 }
 
+.pokemon-api-section {
+    margin-top: 2rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--surface-muted);
+    text-align: center;
+}
+
+.pokemon-api-section h3 {
+    margin-bottom: 1rem;
+}
+
+.pokemon-api-message {
+    color: var(--gray-color);
+    margin: 0;
+}
+
+.pokemon-api-card {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    max-width: 430px;
+    margin: 0 auto;
+}
+
+.pokemon-api-version-card {
+    max-width: 430px;
+    margin: 1rem auto 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.pokemon-api-card img {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    background-color: var(--image-bg);
+    border-radius: 8px;
+}
+
+.pokemon-api-card h4,
+.pokemon-api-version-card h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.pokemon-api-card dl,
+.pokemon-api-version-card dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    text-align: center;
+}
+
+.pokemon-api-card dt,
+.pokemon-api-version-card dt {
+    color: var(--gray-color);
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.pokemon-api-card dd,
+.pokemon-api-version-card dd {
+    margin: 0;
+    font-weight: 700;
+}
+
+.pokemon-color-value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+
+.pokemon-color-swatch {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+}
+
+.pokemon-api-version-card a {
+    color: var(--primary-color);
+    overflow-wrap: anywhere;
+}
+
 .related-products {
     margin-top: 4rem;
 }
@@ -2329,6 +2469,12 @@ header {
     align-items: center;
     padding: 1.5rem;
     border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.cart-item:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
 }
 
 .cart-item-image {
@@ -2341,9 +2487,25 @@ header {
     border-radius: 5px;
 }
 
+.cart-item-image:hover,
+.cart-item-image:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
 .cart-item-details h3 {
     margin-bottom: 0.5rem;
     overflow-wrap: anywhere;
+}
+
+.cart-item-details h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.cart-item-details h3 a:hover,
+.cart-item-details h3 a:focus-visible {
+    color: var(--primary-color);
+    text-decoration: underline;
 }
 
 .cart-item-details {
@@ -2461,6 +2623,22 @@ header {
     color: var(--dark-color);
 }
 
+.promo-code .btn {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.promo-message {
+    min-height: 1.4rem;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.promo-message.error {
+    color: #E74C3C;
+}
+
 /* Checkout */
 .checkout-section {
     padding: 40px 20px;
@@ -2567,6 +2745,85 @@ header {
     height: 1px;
     background-color: var(--border-color);
     margin: 1rem 0;
+}
+
+/* Order Success */
+.order-success-section {
+    padding: 56px 20px;
+}
+
+.order-success-card {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+}
+
+.order-success-eyebrow {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.order-success-card h1 {
+    margin-bottom: 0.75rem;
+    font-size: 2rem;
+}
+
+.order-success-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.order-success-summary div {
+    padding: 1rem;
+    background-color: var(--surface-muted);
+    border-radius: 8px;
+}
+
+.order-success-summary span {
+    display: block;
+    color: var(--gray-color);
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+}
+
+.order-success-summary strong {
+    overflow-wrap: anywhere;
+}
+
+.order-success-items {
+    margin-top: 1.5rem;
+}
+
+.order-success-items h2 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.order-success-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-success-empty {
+    color: var(--gray-color);
+}
+
+.order-success-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 /* Notification */
@@ -2746,6 +3003,10 @@ header {
         min-width: 0;
         max-width: none;
         flex-basis: auto;
+    }
+
+    .header-search-placeholder {
+        display: none;
     }
 
     .nav-right {
@@ -2976,7 +3237,7 @@ header {
     }
 
     .product-detail-image {
-        min-height: 420px;
+        height: min(680px, 82vw);
     }
 
     .cart-item {
@@ -3287,7 +3548,7 @@ header {
     }
 
     .product-detail-image {
-        min-height: 300px;
+        height: min(520px, 118vw);
         padding: 1rem;
     }
 
@@ -3299,11 +3560,34 @@ header {
         font-size: 1.6rem;
     }
 
+    .pokemon-api-card,
+    .pokemon-api-card dl,
+    .pokemon-api-version-card dl {
+        grid-template-columns: 1fr;
+    }
+
+    .pokemon-api-card img {
+        justify-self: center;
+    }
+
     .quantity-section,
     .action-buttons,
+    .order-success-actions,
     .form-row {
         align-items: stretch;
         flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+
+    .order-success-card {
+        padding: 1.25rem;
+    }
+
+    .order-success-card h1 {
+        font-size: 1.55rem;
+    }
+
+    .order-success-summary {
         grid-template-columns: 1fr;
     }
 

@@ -40,6 +40,10 @@ function renderProductPrice(product, modifierClass = '') {
     return `<div class="${className}"><span class="price">${formatPrice(product.price)}</span></div>`;
 }
 
+function openProductDetailPage(productId) {
+    window.location.href = `product-detail.html?id=${productId}`;
+}
+
 function renderProductCard(product) {
     const card = document.createElement('article');
     const discountPercentage = getDiscountPercentage(product);
@@ -70,11 +74,15 @@ function renderProductCard(product) {
                 </svg>
             </button>
         `}
-        <div class="product-image">
+        <button type="button" class="product-image product-image-button" onclick="openProductDetailPage(${product.id})" aria-label="View details for ${safeName}">
             <img src="${safeImage}" alt="${safeName}" class="product-img">
-        </div>
+        </button>
         <div class="product-info">
-            <h3>${safeName}</h3>
+            <h3>
+                <button type="button" class="product-title-button" onclick="openProductDetailPage(${product.id})" aria-label="View details for ${safeName}">
+                    ${safeName}
+                </button>
+            </h3>
             <p class="product-category">${safeCategory}</p>
             ${renderProductRating(product)}
             <p class="product-description">${safeDescription}</p>
@@ -86,7 +94,7 @@ function renderProductCard(product) {
                             <span>Remove</span>
                         </button>
                     ` : `
-                        <button type="button" class="btn btn-outline product-view-btn" onclick="openProductDialog(${product.id})" aria-label="View details for ${safeName}">
+                        <button type="button" class="btn btn-outline product-view-btn" onclick="openProductDetailPage(${product.id})" aria-label="View details for ${safeName}">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
