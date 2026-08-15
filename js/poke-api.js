@@ -161,7 +161,7 @@ function renderPokemonApiCard(pokemon) {
 
     return `
         <div class="pokemon-api-card">
-            ${imageUrl ? `<img src="${escapePokeApiHtml(imageUrl)}" alt="${pokemonName} official artwork">` : ''}
+            ${imageUrl ? `<img src="${escapePokeApiHtml(imageUrl)}" alt="${pokemonName} official artwork" width="110" height="110" loading="lazy" decoding="async">` : ''}
             <div>
                 <h4>${pokemonName}</h4>
                 <dl>

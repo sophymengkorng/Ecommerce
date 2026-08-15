@@ -75,7 +75,7 @@ function renderProductCard(product) {
             </button>
         `}
         <button type="button" class="product-image product-image-button" onclick="openProductDetailPage(${product.id})" aria-label="View details for ${safeName}">
-            <img src="${safeImage}" alt="${safeName}" class="product-img">
+            <img src="${safeImage}" alt="${safeName}" class="product-img" width="420" height="586" loading="lazy" decoding="async">
         </button>
         <div class="product-info">
             <h3>
@@ -164,7 +164,7 @@ function openProductDialog(productId) {
         <div class="product-dialog-layout">
             <div class="product-dialog-image">
                 ${discountBadgeHTML}
-                <img src="${safeImage}" alt="${safeName}" class="product-img">
+                <img src="${safeImage}" alt="${safeName}" class="product-img" width="420" height="586" loading="eager" decoding="async" fetchpriority="high">
             </div>
             <div class="product-dialog-info">
                 <h2>${safeName}</h2>

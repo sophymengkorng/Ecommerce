@@ -154,7 +154,7 @@
             document.getElementById('product-stars').textContent = '\u2605'.repeat(Math.floor(currentProduct.rating || 0));
             document.getElementById('product-reviews').textContent = `(${currentProduct.reviewCount || 0} reviews)`;
             document.getElementById('product-description-detail').textContent = currentProduct.description;
-            document.getElementById('product-image').innerHTML = `<img src="${currentProduct.image}" alt="${currentProduct.name}" class="product-img">`;
+            document.getElementById('product-image').innerHTML = `<img src="${currentProduct.image}" alt="${currentProduct.name}" class="product-img" loading="eager" decoding="async" fetchpriority="high">`;
             document.getElementById('breadcrumb-product').textContent = currentProduct.name;
 
             displayRelatedProducts();

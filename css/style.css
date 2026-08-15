@@ -879,6 +879,8 @@ header {
     min-height: 190px;
     height: 100%;
     padding: 0.85rem;
+    content-visibility: auto;
+    contain-intrinsic-size: 190px;
 }
 
 .product-card:hover {
