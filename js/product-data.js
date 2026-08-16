@@ -1,6 +1,42 @@
 // Product Database
 const products = [
     {
+        id: 23,
+        name: 'Monk of Serenity ex',
+        category: 'Custom Cards',
+        price: 24.99,
+        originalPrice: 29.99,
+        discount: -17,
+        rating: 4.8,
+        reviewCount: 64,
+        description: 'Custom Monk of Serenity ex card with golden forest artwork and a calm collector-card finish.',
+        image: 'image/card1.jpg'
+    },
+    {
+        id: 24,
+        name: 'Rooster Rider ex',
+        category: 'Custom Cards',
+        price: 22.99,
+        originalPrice: 27.99,
+        discount: -18,
+        rating: 4.7,
+        reviewCount: 58,
+        description: 'Exclusive Rooster Rider ex custom card with bold gold borders and street legend styling.',
+        image: 'image/cart2.jpg'
+    },
+    {
+        id: 25,
+        name: 'Street Trainer ex',
+        category: 'Custom Cards',
+        price: 22.99,
+        originalPrice: 27.99,
+        discount: -18,
+        rating: 4.7,
+        reviewCount: 61,
+        description: 'Exclusive Street Trainer ex custom card featuring night-market artwork and a gold foil look.',
+        image: 'image/cart 3.jpg'
+    },
+    {
         id: 1,
         name: 'Pokemon Trading Card Game Box',
         category: 'Sealed Product',

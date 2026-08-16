@@ -1,19 +1,4 @@
 
 > ecommerce-website@1.0.0 dev
-> vite --host 127.0.0.1 --port 5174 --strictPort
+> vite --host 0.0.0.0 --port 8000
 
-
-  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m348[22m[2m[0m ms[22m
-
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5174[22m/[39m
-[2m10:42:18 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproduct-detail.html[22m
-[2m10:42:19 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mcart.html[22m
-[2m10:48:25 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.html[22m
-[2m10:55:13 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mcart.html[22m
-[2m10:55:28 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.ht[2m10:5[2m11:15:01 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mnew-arrival[2m11:15:01[2m11:15:30 AM[22m [36m[1m[vite][22m[39m [32mvite.config.js changed, restarting server...[39m
-[2m11:15:31 AM[22m [36m[1m[vite][22m[39m server restarted.
-[2m11:19:57 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mnew-arrival[2m11:19:57[2m11:19:58 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mnew-arrivals.html[22m
-[2m11:23:20 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mnew-arrivals.html[22m
-[2m11:32:51 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.html[22m
-[2m11:37:32 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.ht[2m11:3[2m11:38:31 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.html[22m
-8:31 AM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mproducts.html[22m
